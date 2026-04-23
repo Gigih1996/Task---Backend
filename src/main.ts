@@ -35,7 +35,7 @@ async function bootstrap() {
     })
   );
 
-  const swaggerConfig = new DocumentBuilder()
+  const swaggerBuilder = new DocumentBuilder()
     .setTitle('Task Management API')
     .setDescription(
       'Professional Task Management REST API built with NestJS, Prisma and MySQL.'
@@ -46,11 +46,23 @@ async function bootstrap() {
       'https://github.com',
       'support@taskflow.dev'
     )
-    .setLicense('MIT', 'https://opensource.org/licenses/MIT')
-    .addServer(`http://localhost:${port}`, 'Local')
+    .setLicense('MIT', 'https://opensource.org/licenses/MIT');
+
+  const railwayDomain = config.get<string>('RAILWAY_PUBLIC_DOMAIN');
+  const publicApiUrl = config.get<string>('PUBLIC_API_URL');
+
+  if (publicApiUrl) {
+    swaggerBuilder.addServer(publicApiUrl, 'Production');
+  } else if (railwayDomain) {
+    swaggerBuilder.addServer(`https://${railwayDomain}`, 'Production (Railway)');
+  }
+  swaggerBuilder.addServer(`http://localhost:${port}`, 'Local Development');
+
+  swaggerBuilder
     .addTag('Health', 'API status and metadata')
-    .addTag('Tasks', 'Create, read, update and delete tasks')
-    .build();
+    .addTag('Tasks', 'Create, read, update and delete tasks');
+
+  const swaggerConfig = swaggerBuilder.build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document, {
