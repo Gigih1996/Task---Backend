@@ -7,7 +7,7 @@ RUN apk add --no-cache openssl
 COPY package*.json ./
 COPY prisma ./prisma
 
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 COPY tsconfig*.json nest-cli.json ./
 COPY src ./src
