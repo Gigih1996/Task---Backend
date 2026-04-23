@@ -57,9 +57,9 @@ async function bootstrap() {
     }
   });
 
-  await app.listen(port);
-  console.log(`🚀 API ready on http://localhost:${port}/api`);
-  console.log(`📘 Swagger docs on http://localhost:${port}/api/docs`);
+  await app.listen(port, '0.0.0.0');
+  console.log(`🚀 API ready on port ${port} — /api`);
+  console.log(`📘 Swagger docs — /api/docs`);
 }
 
 bootstrap();
