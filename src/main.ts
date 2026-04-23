@@ -8,6 +8,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
+  console.log('[bootstrap] Node version:', process.version);
+  console.log('[bootstrap] Creating Nest application...');
+
   const app = await NestFactory.create(AppModule, { cors: false });
   const config = app.get(ConfigService);
 

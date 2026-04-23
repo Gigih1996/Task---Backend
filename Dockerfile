@@ -30,12 +30,9 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
-COPY entrypoint.sh ./entrypoint.sh
-
-RUN chmod +x ./entrypoint.sh
 
 EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["./entrypoint.sh"]
-# cache buster 1776928415
+
+CMD ["sh", "-c", "echo '>>> [1/4] Container started'; echo '>>> [2/4] Running prisma migrate deploy'; /app/node_modules/.bin/prisma migrate deploy || (echo '>>> MIGRATE FAILED' && exit 1); echo '>>> [3/4] Migrations done. Starting Node app...'; node /app/dist/main.js; echo '>>> [4/4] Node process exited with code '$?"]
