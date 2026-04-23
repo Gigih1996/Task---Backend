@@ -1,3 +1,5 @@
+import process from 'node:process';
+
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -9,8 +11,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: false });
   const config = app.get(ConfigService);
 
-  const port = config.get<number>('PORT', 3000);
+  const port = Number(config.get<string>('PORT')) || 3000;
   const corsOrigin = config.get<string>('CORS_ORIGIN', '*');
+
+  console.log(`[bootstrap] PORT=${port}, NODE_ENV=${config.get('NODE_ENV')}`);
 
   app.enableCors({
     origin: corsOrigin === '*' ? true : corsOrigin.split(',').map((s) => s.trim()),
@@ -58,8 +62,11 @@ async function bootstrap() {
   });
 
   await app.listen(port, '0.0.0.0');
-  console.log(`🚀 API ready on port ${port} — /api`);
+  console.log(`🚀 API ready on 0.0.0.0:${port} — /api`);
   console.log(`📘 Swagger docs — /api/docs`);
 }
 
-bootstrap();
+bootstrap().catch((err) => {
+  console.error('[bootstrap] Fatal error:', err);
+  process.exit(1);
+});
